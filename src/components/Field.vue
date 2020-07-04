@@ -1,31 +1,21 @@
 <template lang="pug">
   div
-    component(:is="component" v-bind="{ ...config, type }")
+    component(:is="fieldModule" v-bind="{props}" )
 </template>
 
 <script>
-import { computed } from "@vue/composition-api";
-
-const DEFAULT_TYPE = "text";
-
-const TYPES = {
-	vuetify: {
-		default: "v-text-field",
-		"v-text-field": ["text", "string", "number", "email", "phone"],
-		"v-select": ["select", "dropdown"]
-	}
-};
-
-const NATIVE_TYPES = {
-	number: ["phone"]
-};
+import { computed, provide } from "@vue/composition-api";
 
 export default {
-	name: "field",
+	components: {
+		String: () => import("./modules/String"),
+		Number: () => import("./modules/Number"),
+		Array: () => import("./modules/Array")
+	},
 	props: {
-		library: {
+		type: {
 			type: String,
-			default: "vuetify"
+			default: "string"
 		},
 		config: {
 			type: Object,
@@ -33,49 +23,59 @@ export default {
 		}
 	},
 	setup(props) {
-		const library = computed(() => props.library);
+		provide(
+			"type",
+			computed(() => props.config.typeConfig.type ?? props.config.type)
+		);
 
-		const type = computed(() => props.config.type ?? DEFAULT_TYPE);
-
-		const typesOfLibrary = computed(() => {
-			return TYPES[library.value];
+		const fieldModule = computed(() => {
+			// Field module discover logic
+			return props.config.type;
 		});
 
-		const typeExistsInLibrary = computed(() => {
-			return Object.keys(typesOfLibrary.value).includes(type.value);
-		});
+		const rules = [
+			v =>
+				props.config.rules?.required
+					? !!v || "The field is required"
+					: true,
+			v => {
+				let result = true;
+				let value = v?.length;
 
-		const component = computed(() => {
-			let result = typesOfLibrary.value.default;
-
-			Object.entries(typesOfLibrary.value).forEach(([key, value]) => {
-				if (
-					(Array.isArray(value) && value.includes(type.value)) ||
-					value === type.value
-				) {
-					result = key;
+				if (props.type === "number") {
+					value = v;
 				}
-			});
 
-			return result;
-		});
+				if (v && props.config.rules) {
+					const { min, max } = props.config.rules;
 
-		const nativeType = computed(() => {
-			let result;
+					if (min) {
+						result =
+							value >= min ||
+							`Field required minimum ${min} characters.`;
+					}
 
-			Object.entries(NATIVE_TYPES).forEach(([key, value]) => {
-				if (
-					(Array.isArray(value) && value.includes(type.value)) ||
-					value === type.value
-				) {
-					result = key;
+					if (max) {
+						result =
+							value <= max ||
+							`Field required maximum ${max} characters.`;
+					}
+
+					if (min && max) {
+						result =
+							(value <= max && value >= min) ||
+							`This field must be between ${min} - ${max} characters.`;
+					}
 				}
-			});
 
-			return result;
-		});
+				return result;
+			}
+		];
 
-		return { component, typeExistsInLibrary, type: nativeType };
+		return {
+			fieldModule,
+			props: { ...props.config, rules }
+		};
 	}
 };
 </script>

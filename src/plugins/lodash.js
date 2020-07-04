@@ -4,3 +4,5 @@ import lodash from 'lodash'
 
 // name is optional
 Vue.use(VueLodash, { lodash })
+
+export default {}

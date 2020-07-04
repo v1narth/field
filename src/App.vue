@@ -11,7 +11,7 @@
 
 		<v-main>
 			<v-container>
-				<Field :config="textFieldConfig" />
+				<Field :config="config" class="pt-9" />
 			</v-container>
 		</v-main>
 	</v-app>
@@ -28,10 +28,42 @@ export default {
 	},
 
 	data: () => ({
-		textFieldConfig: {
-			type: "phone",
-			label: "Beautiful label",
-			placeholder: "My placeholder"
+		config: {
+			type: "string",
+			typeConfig: {
+				// type: "slider"
+			},
+			rules: {
+				// min: 1,
+				max: 6,
+				required: true
+			},
+			disabled: false,
+			// value: [1, 2],
+			hint: "Field hint",
+			persistentHint: true,
+			label: "Field Label",
+			placeholder: "Field Placeholder",
+			// prependInnerIcon: "mdi-map-marker",
+			color: "secondary",
+			thumbLabel: true,
+			thumbColor: "yellow",
+			ticks: true,
+			min: 1,
+			max: 3,
+			tickSize: 2,
+			tickLabels: ["First tick", "Second tick"],
+			items: [
+				{
+					customText: "my custom text",
+					customValue: "my custom value"
+				}
+			],
+			// clearIcon: "mdi-map-marker",
+			itemText: "customText",
+			itemValue: "customValue",
+			clearable: true,
+			filled: true
 		}
 	})
 };

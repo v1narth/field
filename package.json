@@ -1,12 +1,21 @@
 {
-  "name": "field2",
+  "name": "@v1narth/field",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "main": "./dist/field.common.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build-bundle": "vue-cli-service build --target lib --name field ./src/components/Field.vue"
   },
+  "files": [
+    "dist/*",
+    "src/*",
+    "public/*",
+    "*.json",
+    "*.js"
+  ],
   "dependencies": {
     "@vue/composition-api": "^0.6.7",
     "core-js": "^3.6.5",
